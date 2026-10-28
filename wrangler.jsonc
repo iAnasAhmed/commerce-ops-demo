@@ -1,0 +1,45 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "velora-commerce-ops-demo",
+  "main": ".open-next/worker.js",
+  // Must not be in the future in UTC — Cloudflare rejects it with error 10021.
+  // Cairo is UTC+3, so a date picked from local time fails for three hours.
+  "compatibility_date": "2026-09-08",
+  // nodejs_compat is required by the OpenNext adapter; global_fetch_strictly_public
+  // stops the Worker resolving its own hostname internally, so a request to the
+  // public URL always goes back out through Cloudflare Access.
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  // Holds exactly one table: delivery_actions — who has been called about a
+  // stuck delivery, and what they said. The only thing this app writes
+  // anywhere; everything else stays read-only against Meta/Shopify/Bosta.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "velora-demo-db",
+      "database_id": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  // Preview URLs get their own per-version hostname, which an Access
+  // application scoped to the production hostname does NOT cover — that would
+  // put an unauthenticated copy of the dashboard on the internet with every
+  // deploy. Off, deliberately.
+  "preview_urls": false,
+  "observability": {
+    "enabled": true
+  },
+  // Non-secret values only. META_ACCESS_TOKEN and SHOPIFY_ADMIN_TOKEN are
+  // encrypted secrets set with `wrangler secret put` — never listed here,
+  // because this file is committed.
+  "vars": {
+    "META_AD_ACCOUNT_ID": "910000000000001",
+    "META_API_VERSION": "v23.0",
+    "SHOPIFY_STORE_DOMAIN": "velora-demo.myshopify.com",
+    "SHOPIFY_API_VERSION": "2025-10",
+    "RTO_RATE": "0.1156",
+    "REQUIRE_CF_ACCESS": "false"
+  }
+}
