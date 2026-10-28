@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { IssueOrder, IssueSeverity, OrderIssuesReport } from "@/lib/order-issues";
 import { cn } from "@/lib/utils";
 import { HelpTip } from "@/components/dashboard/help-tip";
+import { AnimatedValue } from "@/components/dashboard/animated-value";
 
 interface ApiResponse {
   generatedAt: string;
@@ -401,7 +402,7 @@ function Stat({ label, value, tone, help }: { label: string; value: number; tone
         {label}
         <HelpTip label={label} text={help} />
       </p>
-      <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight">{value}</p>
+      <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight"><AnimatedValue value={value} /></p>
     </div>
   );
 }

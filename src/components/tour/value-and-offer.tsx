@@ -120,53 +120,49 @@ export function ValueAndOffer() {
   return (
     <div className="grid gap-6 lg:grid-cols-2">
       {/* ---------------------------------------------------- calculator */}
-      <section id="value" className="scroll-mt-20 bg-card rounded-2xl border p-5 sm:p-7">
+      <section id="value" className="glass scroll-mt-20 rounded-3xl p-5 sm:p-7">
         <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">Step 1</p>
-        <h3 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">What failed deliveries cost you now</h3>
-        <p className="text-muted-foreground mt-2 text-sm">Move the sliders to match your brand. Nothing is sent anywhere.</p>
+        <h3 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">What failed deliveries cost you</h3>
+        
 
         <div className="mt-6 space-y-5">
           <Field label="Orders per day" value={orders} onChange={setOrders} min={5} max={300} />
           <Field label="Average order value" value={aov} onChange={setAov} min={200} max={5000} step={50} suffix=" EGP" />
-          <Field label="Orders that fail to deliver" value={failRate} onChange={setFailRate} min={2} max={35} suffix="%" hint="Refused, unreachable or cancelled at the door. 10–15% is common for cash on delivery in Egypt." />
-          <Field label="Failed orders saved by a call" value={rescue} onChange={setRescue} min={0} max={50} suffix="%" hint="Your guess. A same-day call to a customer who cancelled or didn't answer often saves the order." />
+          <Field label="Orders that fail to deliver" value={failRate} onChange={setFailRate} min={2} max={35} suffix="%" />
+          <Field label="Failed orders saved by a call" value={rescue} onChange={setRescue} min={0} max={50} suffix="%" />
           <Field label="Courier fee for a returned parcel" value={returnFee} onChange={setReturnFee} min={0} max={200} step={5} suffix=" EGP" />
-          <Field label="Hours a day on sheets and checks" value={hours} onChange={setHours} min={0} max={8} step={0.5} hint="Time spent matching Shopify, Bosta and Meta by hand. Valued at EGP 120 an hour." />
+          <Field label="Hours a day on sheets and checks" value={hours} onChange={setHours} min={0} max={8} step={0.5} />
         </div>
 
         <dl className="mt-7 grid grid-cols-2 gap-3 text-sm">
-          <div className="bg-muted/60 rounded-xl p-3">
+          <div className="rounded-2xl border border-white/70 bg-white/50 p-3">
             <dt className="text-muted-foreground text-xs">Failed orders a month</dt>
             <dd className="mt-1 font-mono text-lg font-semibold tabular-nums">{Math.round(v.failed).toLocaleString("en-US")}</dd>
           </div>
-          <div className="bg-muted/60 rounded-xl p-3">
+          <div className="rounded-2xl border border-white/70 bg-white/50 p-3">
             <dt className="text-muted-foreground text-xs">Sales lost to them</dt>
             <dd className="mt-1 font-mono text-lg font-semibold tabular-nums text-red-600 dark:text-red-400">{egp(v.lostSales)}</dd>
           </div>
-          <div className="bg-muted/60 rounded-xl p-3">
+          <div className="rounded-2xl border border-white/70 bg-white/50 p-3">
             <dt className="text-muted-foreground text-xs">Sales saved by calling</dt>
             <dd className="mt-1 font-mono text-lg font-semibold tabular-nums">{egp(v.rescuedSales)}</dd>
           </div>
-          <div className="bg-muted/60 rounded-xl p-3">
+          <div className="rounded-2xl border border-white/70 bg-white/50 p-3">
             <dt className="text-muted-foreground text-xs">Fees and time saved</dt>
             <dd className="mt-1 font-mono text-lg font-semibold tabular-nums">{egp(v.feesAvoided + v.timeValue)}</dd>
           </div>
         </dl>
-        <div className="bg-foreground text-background mt-3 rounded-xl p-4">
+        <div className="btn-glow mt-3 rounded-2xl p-4 text-white">
           <p className="text-xs opacity-75">Estimated value to you, every month</p>
-          <p className="mt-1 font-mono text-3xl font-semibold tabular-nums">{egp(v.total)}</p>
+          <p className="mt-1 font-mono text-4xl font-semibold tabular-nums">{egp(v.total)}</p>
           <p className="mt-1 text-xs opacity-75">{egp(v.total * 12)} a year. An estimate from your own numbers, not a promise.</p>
         </div>
       </section>
 
       {/* ---------------------------------------------------- offer */}
-      <section id="offer" className="scroll-mt-20 bg-card rounded-2xl border p-5 sm:p-7">
+      <section id="offer" className="glass scroll-mt-20 rounded-3xl p-5 sm:p-7">
         <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">Step 2</p>
         <h3 className="mt-1 text-xl font-semibold tracking-tight sm:text-2xl">What would this be worth to you?</h3>
-        <p className="text-muted-foreground mt-2 text-sm">
-          You know your business best. Tell me what you would pay to have this built and connected to your own store, ads and courier.
-         
-        </p>
 
         {status.kind === "sent" ? (
           <div className="mt-6 rounded-xl border border-emerald-600/30 bg-emerald-50 p-5 dark:bg-emerald-950/40" role="status">
@@ -253,7 +249,7 @@ export function ValueAndOffer() {
             <input name="website" tabIndex={-1} autoComplete="off" aria-hidden="true" className="hidden" />
 
             <p className="text-muted-foreground text-xs">
-              Your estimate above ({egp(v.total)} a month) is sent with the offer so I can see the size of the problem. Your details are used only to reply to you.
+              Your estimate ({egp(v.total)}/month) is sent with the offer. Used only to reply to you.
             </p>
 
             {status.kind === "error" && (
@@ -264,7 +260,7 @@ export function ValueAndOffer() {
             <button
               type="submit"
               disabled={status.kind === "sending"}
-              className="bg-foreground text-background w-full rounded-lg px-4 py-3 text-sm font-semibold transition-opacity hover:opacity-90 disabled:opacity-60"
+              className="btn-glow w-full rounded-full px-4 py-3 text-sm font-semibold text-white disabled:opacity-60"
             >
               {status.kind === "sending" ? "Sending…" : "Send my offer"}
             </button>

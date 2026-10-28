@@ -1,246 +1,283 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { Bars, CppChart, DailyChart, Donut, Funnel } from "@/components/tour/charts";
+import { CountUp, Reveal } from "@/components/tour/motion";
 import { ValueAndOffer } from "@/components/tour/value-and-offer";
-import { CALL_TYPES, FAQ, ISSUES, ROUTINE, RULES, SOURCES, TABS, type Severity } from "@/demo/pitch";
-import { cairoDay, parcelOf, world } from "@/demo/world";
+import { CALL_TYPES, FAQ, ISSUES, ROUTINE, TABS, type Severity } from "@/demo/pitch";
+import { pageStats } from "@/demo/stats";
 
 export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Commerce Ops — track ads, Shopify and Bosta in one place",
-  description:
-    "One dashboard for Meta Ads, Shopify and Bosta: real cost per delivered order, every order mistake caught, and a call list for failed deliveries.",
+  description: "Meta Ads, Shopify and Bosta on one screen: real cost per delivered order, 15 order mistakes caught, and a call list for failed deliveries.",
 };
 
-const DAY = 24 * 3600_000;
+const SEV: Array<{ key: Severity; color: string }> = [
+  { key: "Critical", color: "var(--status-critical)" },
+  { key: "Warning", color: "var(--chart-4)" },
+  { key: "Slow", color: "var(--chart-1)" },
+  { key: "Customer", color: "var(--chart-5)" },
+  { key: "Info", color: "oklch(0.6 0 0)" },
+];
 
-/** A full week from the demo world, old enough that every parcel has arrived. */
-function lastWeek() {
-  const now = Date.now();
-  const w = world(now);
-  const days = new Set(Array.from({ length: 7 }, (_, i) => cairoDay(now - (i + 8) * DAY)));
-  let metaPurchases = 0;
-  for (const d of days) for (const ad of w.adDays.get(d)?.values() ?? []) metaPurchases += ad.purchases;
-  const orders = w.orders.filter((o) => days.has(cairoDay(o.createdAt)) && !(o.cancelledAt && o.cancelledAt <= now));
-  const delivered = orders.filter((o) => parcelOf(o, now)?.state.code === 45).length;
-  return { metaPurchases: Math.round(metaPurchases), orders: orders.length, delivered };
+function Glass({ children, className = "" }: { children: React.ReactNode; className?: string }) {
+  return <div className={`glass rounded-3xl p-5 sm:p-6 ${className}`}>{children}</div>;
 }
 
-const SEVERITY: Record<Severity, string> = {
-  Critical: "bg-red-100 text-red-800 dark:bg-red-950 dark:text-red-300",
-  Warning: "bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300",
-  Slow: "bg-sky-100 text-sky-900 dark:bg-sky-950 dark:text-sky-300",
-  Customer: "bg-violet-100 text-violet-900 dark:bg-violet-950 dark:text-violet-300",
-  Info: "bg-muted text-muted-foreground",
-};
-
-function Section({ id, eyebrow, title, intro, children }: { id?: string; eyebrow: string; title: string; intro?: string; children: React.ReactNode }) {
+function Head({ kicker, title }: { kicker: string; title: string }) {
   return (
-    <section id={id} className="scroll-mt-20 py-14 sm:py-20">
-      <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">{eyebrow}</p>
-      <h2 className="mt-2 max-w-3xl text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{title}</h2>
-      {intro && <p className="text-muted-foreground mt-4 max-w-2xl text-base leading-relaxed text-pretty sm:text-lg">{intro}</p>}
-      <div className="mt-8 sm:mt-10">{children}</div>
-    </section>
+    <Reveal className="mb-6 sm:mb-8">
+      <p className="text-xs font-semibold tracking-[0.18em] text-[var(--chart-1)] uppercase">{kicker}</p>
+      <h2 className="mt-2 text-3xl font-semibold tracking-tight text-balance sm:text-5xl">{title}</h2>
+    </Reveal>
   );
 }
 
 export default function Tour() {
-  const wk = lastWeek();
+  const s = pageStats();
+  const t = s.totals;
+  const sevCounts = SEV.map((x) => ({ label: x.key, value: ISSUES.filter((i) => i.severity === x.key).length }));
+  const k = (n: number) => (n >= 1000 ? Math.round(n / 1000) : n);
 
   return (
-    <div className="w-full">
-      <header className="bg-background/85 sticky top-0 z-30 border-b backdrop-blur">
+    <div className="relative w-full overflow-x-clip">
+      <header className="glass-bar sticky top-0 z-30">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4 sm:px-6">
           <span className="truncate text-sm font-semibold tracking-tight">
             Commerce Ops <span className="text-muted-foreground hidden font-normal sm:inline">· Velora demo</span>
           </span>
           <nav className="flex shrink-0 items-center gap-1 text-sm whitespace-nowrap sm:gap-2">
-            <Link href="/app" className="hover:bg-muted rounded-lg px-2.5 py-1.5 sm:px-3">
+            <Link href="/app" className="rounded-full px-3 py-1.5 hover:bg-white/60">
               Live demo
             </Link>
-            <a href="#offer" className="bg-foreground text-background rounded-lg px-2.5 py-1.5 font-medium sm:px-3">
+            <a href="#offer" className="btn-glow rounded-full px-3.5 py-1.5 font-medium text-white">
               Make an offer
             </a>
           </nav>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 sm:px-6">
-        {/* ------------------------------------------------------------ hero */}
-        <section className="pt-12 pb-10 sm:pt-20 sm:pb-14">
-          <p className="text-muted-foreground text-xs font-semibold tracking-wider uppercase">For Shopify brands that sell with cash on delivery</p>
-          <h1 className="mt-3 max-w-4xl text-4xl leading-[1.05] font-semibold tracking-tight text-balance sm:text-6xl">
-            Your ads, your store and your courier. One screen that tells the truth.
-          </h1>
-          <p className="text-muted-foreground mt-5 max-w-2xl text-lg leading-relaxed text-pretty">
-            Meta, Shopify and Bosta each tell a different story about the same week. This dashboard puts them side by side, finds every order that went wrong, and tells your team who to call.
-          </p>
+      <main className="mx-auto max-w-6xl space-y-20 px-4 pb-20 sm:space-y-28 sm:px-6">
+        {/* ------------------------------------------------ hero */}
+        <section className="pt-12 sm:pt-20">
+          <Reveal>
+            <p className="glass inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium">
+              <span className="pulse-dot" /> Meta Ads · Shopify · Bosta
+            </p>
+            <h1 className="mt-5 max-w-4xl text-5xl leading-[0.98] font-semibold tracking-tight text-balance sm:text-7xl">
+              Ads. Store. Courier.{" "}
+              <span className="text-gradient">One screen.</span>
+            </h1>
+          </Reveal>
 
-          <div className="mt-8 grid max-w-3xl grid-cols-3 gap-2 sm:gap-3">
+          <div className="mt-10 grid grid-cols-2 gap-3 lg:grid-cols-4">
             {[
-              ["Meta says", wk.metaPurchases, "purchases"],
-              ["Shopify says", wk.orders, "orders"],
-              ["Bosta delivered", wk.delivered, "orders"],
-            ].map(([label, n, unit], i) => (
-              <div key={String(label)} className={`rounded-2xl border p-3 sm:p-5 ${i === 2 ? "bg-foreground text-background" : "bg-card"}`}>
-                <p className={`text-xs sm:text-sm ${i === 2 ? "opacity-75" : "text-muted-foreground"}`}>{label}</p>
-                <p className="mt-1 font-mono text-3xl font-semibold tabular-nums sm:text-5xl">{n}</p>
-                <p className={`text-xs ${i === 2 ? "opacity-75" : "text-muted-foreground"}`}>{unit}</p>
-              </div>
+              { label: "Sales, 30 days", node: <CountUp value={k(t.revenue)} prefix="EGP " suffix="k" /> },
+              { label: "Orders", node: <CountUp value={t.orders} /> },
+              { label: "Delivered", node: <CountUp value={t.deliveredRate * 100} suffix="%" decimals={1} /> },
+              { label: "Lost to failed delivery", node: <CountUp value={k(t.failedValue)} prefix="EGP " suffix="k" />, red: true },
+            ].map((x, i) => (
+              <Reveal key={x.label} delay={i * 90}>
+                <Glass className="h-full">
+                  <p className="text-muted-foreground text-xs">{x.label}</p>
+                  <p className={`mt-2 font-mono text-2xl font-semibold sm:text-4xl ${x.red ? "text-[var(--status-critical)]" : ""}`}>{x.node}</p>
+                </Glass>
+              </Reveal>
             ))}
           </div>
-          <p className="text-muted-foreground mt-3 text-xs">One week of Velora's orders in this demo, after every parcel arrived or came back. Only the last number pays the bills.</p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/app" className="bg-foreground text-background rounded-xl px-5 py-3 text-sm font-semibold">
-              Open the live demo →
-            </Link>
-            <a href="#value" className="hover:bg-muted rounded-xl border px-5 py-3 text-sm font-semibold">
-              See what it&apos;s worth to you
-            </a>
+          <div className="mt-3 grid gap-3 lg:grid-cols-5">
+            <Reveal className="lg:col-span-2" delay={100}>
+              <Glass className="h-full">
+                <p className="mb-4 text-sm font-semibold">Same 30 days, three answers</p>
+                <Funnel data={s.funnel} />
+              </Glass>
+            </Reveal>
+            <Reveal className="lg:col-span-3" delay={200}>
+              <Glass className="h-full">
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-sm font-semibold">Orders per day</p>
+                  <p className="flex gap-3 text-xs">
+                    <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-[var(--chart-3)]" />Delivered</span>
+                    <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-[var(--status-critical)]" />Failed</span>
+                  </p>
+                </div>
+                <DailyChart data={s.days} />
+              </Glass>
+            </Reveal>
           </div>
 
-          <div className="mt-12 overflow-hidden rounded-2xl border shadow-sm">
-            <Image src="/tour/live.png" alt="The Live tab: real cost per purchase, alerts and campaign table" width={1440} height={900} priority className="h-auto w-full" />
+          <Reveal delay={150} className="mt-8 flex flex-wrap gap-3">
+            <Link href="/app" className="btn-glow rounded-full px-6 py-3 text-sm font-semibold text-white">
+              Open the live demo →
+            </Link>
+            <a href="#value" className="glass rounded-full px-6 py-3 text-sm font-semibold">
+              What&apos;s it worth to you?
+            </a>
+          </Reveal>
+        </section>
+
+        {/* ------------------------------------------------ ad cost */}
+        <section>
+          <Head kicker="Ad cost" title="Meta's number vs the real one." />
+          <div className="grid gap-3 lg:grid-cols-3">
+            <Reveal>
+              <Glass className="h-full space-y-5">
+                <div>
+                  <p className="text-muted-foreground text-xs">Meta cost per purchase</p>
+                  <p className="font-mono text-4xl font-semibold text-[var(--chart-1)]"><CountUp value={Math.round(t.metaCpp)} prefix="EGP " /></p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">Real cost per delivered order</p>
+                  <p className="font-mono text-4xl font-semibold text-[var(--chart-2)]"><CountUp value={Math.round(t.realCpp)} prefix="EGP " /></p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground text-xs">Gap</p>
+                  <p className="font-mono text-4xl font-semibold"><CountUp value={(t.realCpp / t.metaCpp - 1) * 100} prefix="+" suffix="%" decimals={0} /></p>
+                </div>
+              </Glass>
+            </Reveal>
+            <Reveal delay={120} className="lg:col-span-2">
+              <Glass className="h-full">
+                <div className="mb-2 flex items-center justify-between">
+                  <p className="text-sm font-semibold">Cost per purchase, weekly</p>
+                  <p className="flex gap-3 text-xs">
+                    <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-[var(--chart-1)]" />Meta</span>
+                    <span className="flex items-center gap-1.5"><i className="size-2 rounded-full bg-[var(--chart-2)]" />Real</span>
+                  </p>
+                </div>
+                <CppChart data={s.weeks} />
+              </Glass>
+            </Reveal>
           </div>
         </section>
 
-        {/* ------------------------------------------------------------ sources */}
-        <Section eyebrow="What it connects" title="Three sources. One set of numbers you can trust." intro="It reads from the tools you already use. It never changes anything in them.">
-          <div className="grid gap-3 md:grid-cols-3">
-            {SOURCES.map((s) => (
-              <div key={s.name} className="bg-card rounded-2xl border p-5">
-                <h3 className="text-lg font-semibold">{s.name}</h3>
-                <p className="text-muted-foreground mt-2 text-sm leading-relaxed">{s.reads}</p>
-                <p className="mt-3 text-sm font-medium">{s.why}</p>
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        {/* ------------------------------------------------------------ tabs */}
-        <Section id="tour" eyebrow="Inside the dashboard" title="Nine tabs. Each one answers one question." intro="Every screenshot below is from the live demo with Velora's made-up data.">
-          <div className="space-y-16 sm:space-y-24">
-            {TABS.map((t, i) => (
-              <article key={t.id} className="grid items-center gap-6 lg:grid-cols-5 lg:gap-10">
-                <div className={`lg:col-span-2 ${i % 2 ? "lg:order-2" : ""}`}>
-                  <p className="text-muted-foreground font-mono text-xs">{String(i + 1).padStart(2, "0")} / {String(TABS.length).padStart(2, "0")}</p>
-                  <h3 className="mt-1 text-2xl font-semibold tracking-tight">{t.name}</h3>
-                  <p className="mt-2 text-lg text-pretty">{t.line}</p>
-                  <ul className="text-muted-foreground mt-4 space-y-2 text-sm leading-relaxed">
-                    {t.points.map((p) => (
-                      <li key={p} className="flex gap-2">
-                        <span aria-hidden className="text-foreground">✓</span>
-                        <span>{p}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Link href={`/app#${t.id}`} className="mt-5 inline-block text-sm font-semibold underline underline-offset-4">
-                    Open {t.name} in the demo →
-                  </Link>
-                </div>
-                <div className={`overflow-hidden rounded-2xl border shadow-sm lg:col-span-3 ${i % 2 ? "lg:order-1" : ""}`}>
-                  <Image src={t.shot} alt={`The ${t.name} tab`} width={1440} height={900} className="h-auto w-full" />
-                </div>
-              </article>
-            ))}
-          </div>
-        </Section>
-
-        {/* ------------------------------------------------------------ issues */}
-        <Section
-          id="issues"
-          eyebrow="Order issues it catches"
-          title={`${ISSUES.length} ways an order goes wrong between Shopify and Bosta. All caught automatically.`}
-          intro="Every recent order is checked against its waybill. Each problem comes with what is wrong and exactly how to fix it."
-        >
-          <div className="overflow-hidden rounded-2xl border">
-            <div className="text-muted-foreground bg-muted/50 hidden grid-cols-12 gap-4 px-5 py-3 text-xs font-semibold tracking-wider uppercase md:grid">
-              <span className="col-span-5">Problem</span>
-              <span className="col-span-4">Example</span>
-              <span className="col-span-3">What it saves you</span>
-            </div>
-            <ul className="divide-y">
-              {ISSUES.map((x) => (
-                <li key={x.title} className="grid gap-2 px-5 py-4 md:grid-cols-12 md:gap-4">
-                  <div className="md:col-span-5">
-                    <span className={`mb-1.5 inline-block rounded-full px-2 py-0.5 text-[11px] font-semibold ${SEVERITY[x.severity]}`}>{x.severity}</span>
-                    <p className="font-medium">{x.title}</p>
-                  </div>
-                  <p className="text-muted-foreground text-sm md:col-span-4">{x.example}</p>
-                  <p className="text-sm md:col-span-3">{x.saves}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Section>
-
-        {/* ------------------------------------------------------------ calls */}
-        <Section eyebrow="Failed deliveries" title="A call list your team can finish before the next attempt." intro="Each failed or cancelled delivery is sorted by what to do about it, with the phone number, cash amount and the courier's reason in one row.">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {CALL_TYPES.map((c) => (
-              <div key={c.name} className="bg-card rounded-2xl border p-5">
-                <h3 className="font-semibold">{c.name}</h3>
-                <p className="text-muted-foreground mt-2 text-sm leading-relaxed">{c.what}</p>
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        {/* ------------------------------------------------------------ guide */}
-        <Section id="guide" eyebrow="How to use it" title="A daily routine that takes about an hour." intro="The dashboard does the checking. Your team does the fixing, in this order.">
-          <ol className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-            {ROUTINE.map((r) => (
-              <li key={r.when} className="bg-card rounded-2xl border p-5">
-                <div className="flex items-baseline justify-between gap-3">
-                  <h3 className="font-semibold">{r.when}</h3>
-                  <span className="text-muted-foreground font-mono text-xs">{r.time}</span>
-                </div>
-                <p className="text-muted-foreground mt-0.5 text-xs">{r.who}</p>
-                <ul className="mt-3 space-y-2 text-sm leading-relaxed">
-                  {r.steps.map((s) => (
-                    <li key={s} className="flex gap-2">
-                      <span aria-hidden className="text-muted-foreground">→</span>
-                      <span>{s}</span>
+        {/* ------------------------------------------------ issues */}
+        <section id="issues" className="scroll-mt-20">
+          <Head kicker="Order issues" title="15 mistakes. Caught automatically." />
+          <div className="grid gap-3 lg:grid-cols-5">
+            <Reveal className="lg:col-span-2">
+              <Glass className="h-full">
+                <Donut data={sevCounts} center={ISSUES.length} centerLabel="checks" colors={SEV.map((x) => x.color)} />
+              </Glass>
+            </Reveal>
+            <Reveal delay={120} className="lg:col-span-3">
+              <Glass className="h-full">
+                <ul className="flex flex-wrap gap-2">
+                  {ISSUES.map((x, i) => (
+                    <li
+                      key={x.title}
+                      className="chip-in rounded-full border border-white/70 bg-white/55 px-3 py-1.5 text-xs font-medium"
+                      style={{ animationDelay: `${i * 45}ms`, borderLeft: `4px solid ${SEV.find((s) => s.key === x.severity)?.color}` }}
+                    >
+                      {x.title}
                     </li>
                   ))}
                 </ul>
-              </li>
-            ))}
-          </ol>
-          <div className="bg-muted/50 mt-6 rounded-2xl p-5 sm:p-6">
-            <h3 className="font-semibold">Five rules</h3>
-            <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed">
-              {RULES.map((r) => (
-                <li key={r}>{r}</li>
-              ))}
-            </ol>
+              </Glass>
+            </Reveal>
           </div>
-        </Section>
+        </section>
 
-        {/* ------------------------------------------------------------ value + offer */}
-        <Section eyebrow="Your brand" title="Work out what it's worth, then name your price." intro="Every brand is different, so there is no fixed price. Start from what failed deliveries cost you today.">
-          <ValueAndOffer />
-        </Section>
-
-        {/* ------------------------------------------------------------ faq */}
-        <Section eyebrow="Questions" title="Before you ask">
-          <dl className="divide-y rounded-2xl border">
-            {FAQ.map((f) => (
-              <div key={f.q} className="p-5">
-                <dt className="font-semibold">{f.q}</dt>
-                <dd className="text-muted-foreground mt-1.5 text-sm leading-relaxed">{f.a}</dd>
+        {/* ------------------------------------------------ deliveries */}
+        <section>
+          <Head kicker="Failed deliveries" title="Why parcels come back." />
+          <div className="grid gap-3 md:grid-cols-3">
+            <Reveal>
+              <Glass className="h-full">
+                <p className="mb-4 text-sm font-semibold">Reasons, 30 days</p>
+                <Bars data={s.reasons} color="var(--status-critical)" />
+              </Glass>
+            </Reveal>
+            <Reveal delay={100}>
+              <Glass className="h-full">
+                <p className="mb-4 text-sm font-semibold">How customers pay</p>
+                <Donut data={s.payments} center={t.orders} centerLabel="orders" />
+              </Glass>
+            </Reveal>
+            <Reveal delay={200}>
+              <Glass className="h-full">
+                <p className="mb-4 text-sm font-semibold">Top cities</p>
+                <Bars data={s.cities} color="var(--chart-1)" />
+              </Glass>
+            </Reveal>
+          </div>
+          <Reveal delay={150} className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {CALL_TYPES.map((c) => (
+              <div key={c.name} className="glass rounded-2xl px-4 py-3 text-sm font-medium">
+                {c.name}
               </div>
             ))}
-          </dl>
-        </Section>
+          </Reveal>
+        </section>
+
+        {/* ------------------------------------------------ tabs */}
+        <section id="tour" className="scroll-mt-20">
+          <Head kicker="Inside" title="9 tabs. One question each." />
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {TABS.map((tab, i) => (
+              <Reveal key={tab.id} delay={(i % 3) * 90}>
+                <Link href={`/app#${tab.id}`} className="glass lift group block overflow-hidden rounded-3xl">
+                  <div className="overflow-hidden border-b border-white/60">
+                    <Image src={tab.shot} alt={`The ${tab.name} tab`} width={1440} height={900} className="h-auto w-full transition-transform duration-700 group-hover:scale-[1.04]" />
+                  </div>
+                  <div className="p-4">
+                    <p className="flex items-center justify-between font-semibold">
+                      {tab.name}
+                      <span className="text-muted-foreground font-mono text-xs">{String(i + 1).padStart(2, "0")}</span>
+                    </p>
+                    <p className="text-muted-foreground mt-0.5 text-sm">{tab.line}</p>
+                  </div>
+                </Link>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        {/* ------------------------------------------------ routine */}
+        <section id="guide" className="scroll-mt-20">
+          <Head kicker="Daily routine" title="About an hour a day." />
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+            {ROUTINE.map((r, i) => (
+              <Reveal key={r.when} delay={i * 80}>
+                <Glass className="h-full">
+                  <p className="font-mono text-2xl font-semibold text-[var(--chart-1)]">{r.time.replace(" minutes", "m")}</p>
+                  <p className="mt-1 font-semibold">{r.when}</p>
+                  <p className="text-muted-foreground text-xs">{r.who}</p>
+                  <p className="mt-3 text-sm">{r.steps[0]}</p>
+                </Glass>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        {/* ------------------------------------------------ value + offer */}
+        <section>
+          <Head kicker="Your brand" title="Your numbers. Your price." />
+          <ValueAndOffer />
+        </section>
+
+        {/* ------------------------------------------------ faq */}
+        <section>
+          <Head kicker="Questions" title="Quick answers." />
+          <div className="grid gap-3 md:grid-cols-2">
+            {FAQ.map((f, i) => (
+              <Reveal key={f.q} delay={i * 80}>
+                <Glass className="h-full">
+                  <p className="font-semibold">{f.q}</p>
+                  <p className="text-muted-foreground mt-1.5 text-sm">{f.a}</p>
+                </Glass>
+              </Reveal>
+            ))}
+          </div>
+        </section>
       </main>
 
-      <footer className="border-t">
+      <footer className="glass-bar">
         <div className="text-muted-foreground mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-6 text-xs sm:px-6">
-          <span>Commerce Ops demo · Velora Cosmetics is a made-up brand.</span>
+          <span>Velora Cosmetics is a made-up brand. All data is generated.</span>
           <span className="flex gap-4">
             <Link href="/app" className="hover:text-foreground">Live demo</Link>
             <a href="#offer" className="hover:text-foreground">Make an offer</a>

@@ -20,7 +20,7 @@
     {
       "binding": "DB",
       "database_name": "velora-demo-db",
-      "database_id": "00000000-0000-0000-0000-000000000000"
+      "database_id": "e59c24b9-98bb-4ac3-9028-8d3e58515392"
     }
   ],
   // Preview URLs get their own per-version hostname, which an Access
@@ -40,6 +40,8 @@
     "SHOPIFY_STORE_DOMAIN": "velora-demo.myshopify.com",
     "SHOPIFY_API_VERSION": "2025-10",
     "RTO_RATE": "0.1156",
-    "REQUIRE_CF_ACCESS": "false"
+    "REQUIRE_CF_ACCESS": "false",
+    // Public demo: only the offer form may write.
+    "DEMO_READONLY": "true"
   }
 }

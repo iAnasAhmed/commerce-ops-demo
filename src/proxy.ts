@@ -49,7 +49,22 @@ function secure(response: NextResponse): NextResponse {
   return response;
 }
 
+/** Public demo: visitors can click everything, but only the offer form saves. */
+function demoReadOnly(request: NextRequest): NextResponse | null {
+  if (process.env.DEMO_READONLY !== "true") return null;
+  if (request.method === "GET" || request.method === "HEAD") return null;
+  if (request.nextUrl.pathname === "/api/offer") return null;
+  return secure(
+    NextResponse.json(
+      { error: "demo_readonly", message: "This is a public demo, so changes aren't saved." },
+      { status: 403 },
+    ),
+  );
+}
+
 export async function proxy(request: NextRequest) {
+  const blocked = demoReadOnly(request);
+  if (blocked) return blocked;
   if (!accessRequired()) {
     // Local development: no Access in front, so nothing to verify.
     return secure(NextResponse.next());

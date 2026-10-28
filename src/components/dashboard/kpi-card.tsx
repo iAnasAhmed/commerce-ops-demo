@@ -3,6 +3,7 @@ import { ArrowDown, ArrowUp, Minus } from "lucide-react";
 import { HelpTip } from "@/components/dashboard/help-tip";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
+import { AnimatedValue } from "@/components/dashboard/animated-value";
 
 export interface KpiCardProps {
   label: string;
@@ -50,7 +51,7 @@ export function KpiCard({
         </div>
 
         <p className="mt-2 text-3xl font-semibold tabular-nums tracking-tight">
-          {value}
+          <AnimatedValue value={value} />
         </p>
 
         {hasDelta && (rising || falling) && (

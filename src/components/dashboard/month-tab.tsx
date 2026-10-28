@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { MonthReport, MonthTotals } from "@/lib/month";
 import { cn } from "@/lib/utils";
+import { AnimatedValue } from "@/components/dashboard/animated-value";
 
 type Response = MonthReport & { role: string; fetchedAt: string; stale: boolean };
 
@@ -266,7 +267,7 @@ function Hero({ label, value, now, before }: { label: string; value: string; now
   return (
     <div className="min-w-0">
       <p className="text-sm font-medium text-foreground/70">{label}</p>
-      <p className="mt-1 text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl">{value}</p>
+      <p className="mt-1 text-2xl font-semibold tracking-tight tabular-nums sm:text-3xl"><AnimatedValue value={value} /></p>
       <Trend now={now} before={before} label="vs last month" small />
     </div>
   );
@@ -339,7 +340,7 @@ function Metric({
           tone === "bad" && "text-[var(--status-critical)]",
         )}
       >
-        {value}
+        <AnimatedValue value={value} />
       </p>
       {sub && <p className="text-muted-foreground mt-0.5 text-xs">{sub}</p>}
       {typeof now === "number" && typeof before === "number" && (

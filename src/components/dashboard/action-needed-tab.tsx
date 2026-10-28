@@ -10,6 +10,7 @@ import type { ActionItem, ParcelWhereabouts, ReasonCategory } from "@/lib/bosta"
 import { formatEgp } from "@/lib/metrics";
 import { cn } from "@/lib/utils";
 import { HelpTip } from "@/components/dashboard/help-tip";
+import { AnimatedValue } from "@/components/dashboard/animated-value";
 
 interface ActionRow extends ActionItem {
   log: ActionLogEntry | null;
@@ -457,7 +458,7 @@ function Stat({ label, value, help, emphasis = false }: { label: string; value: 
         {label}
         <HelpTip label={label} text={help} />
       </p>
-      <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight">{value}</p>
+      <p className="mt-1.5 text-2xl font-semibold tabular-nums tracking-tight"><AnimatedValue value={value} /></p>
     </div>
   );
 }

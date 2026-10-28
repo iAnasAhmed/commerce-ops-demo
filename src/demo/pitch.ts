@@ -290,18 +290,18 @@ export const RULES = [
 export const FAQ = [
   {
     q: "Can it change my ads, orders or shipments?",
-    a: "No. It only reads from Meta, Shopify and Bosta. The only things it saves are your own notes, such as who was called and which issue was fixed.",
+    a: "No. It only reads. It saves just your own notes.",
   },
   {
     q: "Who can open it?",
-    a: "Only the people you add, signed in with their Google account. Each role sees only its own tabs.",
+    a: "Only people you add, with Google sign-in. Each role sees its own tabs.",
   },
   {
     q: "We don't use Bosta. Will it work?",
-    a: "This version is built for Bosta, Shopify and Meta. Another courier or store can be connected as part of your project.",
+    a: "Built for Bosta. Another courier can be connected in your project.",
   },
   {
     q: "Is the data on this page real?",
-    a: "No. Velora Cosmetics is a made-up brand. The orders, ads and customers are generated, at the size of a real Egyptian cosmetics brand doing about 15–20 orders a day. The checks that find problems are the real ones.",
+    a: "No. Velora is made up, at the size of a real brand doing 15–20 orders a day. The checks are real.",
   },
 ] as const;

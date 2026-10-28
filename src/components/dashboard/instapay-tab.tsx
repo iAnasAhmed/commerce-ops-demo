@@ -8,6 +8,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import type { InstapayCheck, InstapayOrder } from "@/lib/instapay";
 import { cn } from "@/lib/utils";
 import { HelpTip } from "@/components/dashboard/help-tip";
+import { AnimatedValue } from "@/components/dashboard/animated-value";
 
 interface ApiResponse {
   fetchedAt: string;
@@ -147,7 +148,7 @@ export function InstapayTab() {
               <HelpTip label={g.title} text={g.help} />
             </p>
             <p className="mt-1.5 text-2xl font-semibold tabular-nums">
-              {data.orders.filter((o) => groupOf(o) === g.id).length}
+              <AnimatedValue value={data.orders.filter((o) => groupOf(o) === g.id).length} />
             </p>
           </div>
         ))}

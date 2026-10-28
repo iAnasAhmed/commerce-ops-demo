@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   devIndicators: false,
   // Cloudflare Workers has no image optimiser; the tour images are already sized.
   images: { unoptimized: true },
+  // One build worker: keeps memory low on small machines.
+  experimental: { cpus: 1, workerThreads: false },
   // Pin the workspace root. Without this, Turbopack walks up and finds the
   // stray package-lock.json in the home directory, then warns on every build.
   turbopack: {
