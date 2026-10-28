@@ -260,3 +260,7 @@ footer.glass-bar { border-top: 1px solid var(--glass-edge); border-bottom: 0; }
   .chip-in, [data-slot="tabs-content"] > * { animation: none; }
   .lift, .btn-glow { transition: none; }
 }
+
+.rise-in { animation: rise-blur 0.9s cubic-bezier(.22,1,.36,1) both; }
+@keyframes rise-blur { from { opacity: 0; transform: translateY(24px) scale(0.985); filter: blur(6px); } }
+@media (prefers-reduced-motion: reduce) { .rise-in { animation: none; } }

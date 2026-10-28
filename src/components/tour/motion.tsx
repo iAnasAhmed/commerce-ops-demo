@@ -25,8 +25,16 @@ export function useInView<T extends Element>(margin = "-10% 0px") {
 }
 
 /** Fades and lifts its children in when scrolled into view. */
-export function Reveal({ children, delay = 0, className = "" }: { children: React.ReactNode; delay?: number; className?: string }) {
+export function Reveal({ children, delay = 0, className = "", instant = false }: { children: React.ReactNode; delay?: number; className?: string; instant?: boolean }) {
   const [ref, seen] = useInView<HTMLDivElement>();
+  // Above the fold: animate with CSS on load, without waiting for JavaScript.
+  if (instant) {
+    return (
+      <div className={`rise-in ${className}`} style={{ animationDelay: `${delay}ms` }}>
+        {children}
+      </div>
+    );
+  }
   return (
     <div ref={ref} className={`reveal ${seen ? "is-in" : ""} ${className}`} style={{ transitionDelay: `${delay}ms` }}>
       {children}

@@ -62,7 +62,7 @@ export default function Tour() {
       <main className="mx-auto max-w-6xl space-y-20 px-4 pb-20 sm:space-y-28 sm:px-6">
         {/* ------------------------------------------------ hero */}
         <section className="pt-12 sm:pt-20">
-          <Reveal>
+          <Reveal instant>
             <p className="glass inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium">
               <span className="pulse-dot" /> Meta Ads · Shopify · Bosta
             </p>
@@ -79,7 +79,7 @@ export default function Tour() {
               { label: "Delivered", node: <CountUp value={t.deliveredRate * 100} suffix="%" decimals={1} /> },
               { label: "Lost to failed delivery", node: <CountUp value={k(t.failedValue)} prefix="EGP " suffix="k" />, red: true },
             ].map((x, i) => (
-              <Reveal key={x.label} delay={i * 90}>
+              <Reveal instant key={x.label} delay={i * 90}>
                 <Glass className="h-full">
                   <p className="text-muted-foreground text-xs">{x.label}</p>
                   <p className={`mt-2 font-mono text-2xl font-semibold sm:text-4xl ${x.red ? "text-[var(--status-critical)]" : ""}`}>{x.node}</p>
@@ -89,13 +89,13 @@ export default function Tour() {
           </div>
 
           <div className="mt-3 grid gap-3 lg:grid-cols-5">
-            <Reveal className="lg:col-span-2" delay={100}>
+            <Reveal instant className="lg:col-span-2" delay={100}>
               <Glass className="h-full">
                 <p className="mb-4 text-sm font-semibold">Same 30 days, three answers</p>
                 <Funnel data={s.funnel} />
               </Glass>
             </Reveal>
-            <Reveal className="lg:col-span-3" delay={200}>
+            <Reveal instant className="lg:col-span-3" delay={200}>
               <Glass className="h-full">
                 <div className="mb-2 flex items-center justify-between">
                   <p className="text-sm font-semibold">Orders per day</p>
@@ -109,7 +109,7 @@ export default function Tour() {
             </Reveal>
           </div>
 
-          <Reveal delay={150} className="mt-8 flex flex-wrap gap-3">
+          <Reveal instant delay={150} className="mt-8 flex flex-wrap gap-3">
             <Link href="/app" className="btn-glow rounded-full px-6 py-3 text-sm font-semibold text-white">
               Open the live demo →
             </Link>
@@ -169,9 +169,10 @@ export default function Tour() {
                   {ISSUES.map((x, i) => (
                     <li
                       key={x.title}
-                      className="chip-in rounded-full border border-white/70 bg-white/55 px-3 py-1.5 text-xs font-medium"
-                      style={{ animationDelay: `${i * 45}ms`, borderLeft: `4px solid ${SEV.find((s) => s.key === x.severity)?.color}` }}
+                      className="chip-in flex items-center gap-2 rounded-full border border-white/70 bg-white/55 px-3 py-1.5 text-xs font-medium"
+                      style={{ animationDelay: `${i * 45}ms` }}
                     >
+                      <i className="size-2 shrink-0 rounded-full" style={{ background: SEV.find((s) => s.key === x.severity)?.color }} />
                       {x.title}
                     </li>
                   ))}
