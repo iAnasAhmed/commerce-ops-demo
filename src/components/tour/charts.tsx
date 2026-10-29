@@ -48,7 +48,7 @@ function Lazy({ height, children }: { height: number; children: React.ReactNode 
   );
 }
 
-export function DailyChart({ data }: { data: Array<{ day: string; delivered: number; failed: number }> }) {
+export function DailyChart({ data, names = ["Delivered", "Failed"] }: { data: Array<{ day: string; delivered: number; failed: number }>; names?: [string, string] }) {
   return (
     <Lazy height={240}>
       <ResponsiveContainer width="100%" height="100%">
@@ -67,15 +67,15 @@ export function DailyChart({ data }: { data: Array<{ day: string; delivered: num
           <XAxis dataKey="day" tickLine={false} axisLine={false} fontSize={11} interval={6} />
           <YAxis tickLine={false} axisLine={false} fontSize={11} allowDecimals={false} />
           <Tooltip {...tip} />
-          <Area type="monotone" dataKey="delivered" name="Delivered" stackId="1" stroke={C.green} strokeWidth={2} fill="url(#gDel)" animationDuration={1400} />
-          <Area type="monotone" dataKey="failed" name="Failed" stackId="1" stroke={C.red} strokeWidth={2} fill="url(#gFail)" animationDuration={1400} animationBegin={300} />
+          <Area type="monotone" dataKey="delivered" name={names[0]} stackId="1" stroke={C.green} strokeWidth={2} fill="url(#gDel)" animationDuration={1400} />
+          <Area type="monotone" dataKey="failed" name={names[1]} stackId="1" stroke={C.red} strokeWidth={2} fill="url(#gFail)" animationDuration={1400} animationBegin={300} />
         </AreaChart>
       </ResponsiveContainer>
     </Lazy>
   );
 }
 
-export function CppChart({ data }: { data: Array<{ week: string; meta: number; real: number }> }) {
+export function CppChart({ data, names = ["Meta says", "Real (delivered)"] }: { data: Array<{ week: string; meta: number; real: number }>; names?: [string, string] }) {
   return (
     <Lazy height={240}>
       <ResponsiveContainer width="100%" height="100%">
@@ -84,8 +84,8 @@ export function CppChart({ data }: { data: Array<{ week: string; meta: number; r
           <XAxis dataKey="week" tickLine={false} axisLine={false} fontSize={11} />
           <YAxis tickLine={false} axisLine={false} fontSize={11} />
           <Tooltip {...tip} formatter={(v) => `EGP ${Number(v).toLocaleString("en-US")}`} />
-          <Line type="monotone" dataKey="meta" name="Meta says" stroke={C.blue} strokeWidth={2.5} dot={false} animationDuration={1500} />
-          <Line type="monotone" dataKey="real" name="Real (delivered)" stroke={C.orange} strokeWidth={3} dot={{ r: 3 }} animationDuration={1500} animationBegin={250} />
+          <Line type="monotone" dataKey="meta" name={names[0]} stroke={C.blue} strokeWidth={2.5} dot={false} animationDuration={1500} />
+          <Line type="monotone" dataKey="real" name={names[1]} stroke={C.orange} strokeWidth={3} dot={{ r: 3 }} animationDuration={1500} animationBegin={250} />
         </LineChart>
       </ResponsiveContainer>
     </Lazy>

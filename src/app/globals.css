@@ -264,3 +264,13 @@ footer.glass-bar { border-top: 1px solid var(--glass-edge); border-bottom: 0; }
 .rise-in { animation: rise-blur 0.9s cubic-bezier(.22,1,.36,1) both; }
 @keyframes rise-blur { from { opacity: 0; transform: translateY(24px) scale(0.985); filter: blur(6px); } }
 @media (prefers-reduced-motion: reduce) { .rise-in { animation: none; } }
+
+/* Arabic sales page: Arabic font first, Latin numbers stay in Geist. */
+.font-arabic {
+  font-family: var(--font-arabic), var(--font-geist-sans), sans-serif;
+}
+.font-arabic h1,
+.font-arabic h2 {
+  letter-spacing: 0;
+  line-height: 1.25;
+}
